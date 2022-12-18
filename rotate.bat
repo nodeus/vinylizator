@@ -1,38 +1,43 @@
 rem using ffmpeg https://ffmpeg.org/
 rem using graphicsmagic http://www.graphicsmagick.org
-
 @cls
-rem @echo off
+@echo off
+@chcp 65001
+@set audio=audio/audio.mp3
+set codec=-c:v hevc_nvenc -profile:v main10 -pix_fmt yuv420p -preset fast -rc constqp -qp 22 -init_qpB 2 -movflags +faststart -flags +cgop -framerate 60 -r 60
+copy /y %CD%\gfx\default\albumart.png %CD%\gfx\albumart.png
+
 rem set time in sec for 360 degree rotate
-chcp 65001
-set name=audio/audio.mp3
-@set time=15
-for /f "tokens=1 delims=x" %%b in ('"ffprobe -v error -show_entries format_tags=artist -of csv=s=x:p=0 "%name%""') do set artist=%%b
-for /f "tokens=1 delims=x" %%c in ('"ffprobe -v error -show_entries format_tags=title -of csv=s=x:p=0 "%name%""') do set title=%%c
+set time=15
+
+echo [1/7] generate text metadata
+
+for /f "tokens=1 delims=x" %%b in ('"ffprobe -v error -show_entries format_tags=artist -of csv=s=x:p=0 "%audio%""') do set artist=%%b
+for /f "tokens=1 delims=x" %%c in ('"ffprobe -v error -show_entries format_tags=title -of csv=s=x:p=0 "%audio%""') do set title=%%c
+set filename="%artist%-%title%"
+set filename=%filename: =_%
 
 rem extract albumart
-@echo extract albumart
-ffmpeg -y -i %name% -c:v copy -an gfx/albumart.png
+echo [2/7] extract albumart
+ffmpeg -loglevel error -hide_banner -y -i %audio% -c:v copy -an gfx/albumart.png
 
 rem resize image
-
-ffmpeg -y -i gfx/albumart.png -filter_complex scale=-2:368 -sws_flags spline gfx/cover.png
+echo [3/7] resize albumart
+ffmpeg -loglevel error -hide_banner -y -i gfx/albumart.png -filter_complex scale=-2:368 -sws_flags spline gfx/cover.png
 
 rem composite cover and clear vinyl mockup
-
-gm composite -compose multiply -geometry +356+356 gfx/cover.png gfx/vinyl-mock-clear.png gfx/covernew.png
+echo [4/7] composite cover and empty vinyl mockup
+magick gfx/cover.png -gravity center gfx/default/label-clear-mask.png -alpha Off -compose CopyOpacity -composite gfx/covercrop.png
+magick composite -gravity center -compose Multiply gfx/covercrop.png gfx/default/vinyl-mock-clear.png gfx/covernew.png
 
 rem generate video cover from albumart with music duration
-@echo generate video cover
-ffmpeg -y -loop 1 -framerate 60 -i gfx/covernew.png -i audio.mp3 -c:v libx265 -x265-params lossless=1  -shortest -pix_fmt yuv420p -movflags faststart video/out.mp4
-
-@echo generate text metadata
+echo [5/7] generate video cover
+ffmpeg -loglevel error -hide_banner -y -loop 1 -i gfx/covernew.png -i %audio% -shortest -vf drawtext="fontsize=14:fontfile=font/PTM55F.ttf:text='%artist%-%title%':x=(w-text_w)/2:y=(h-text_h)/2+45" %codec% video/out.mp4
 
 rem generate rotated cover from albumart
-@echo generate rotated video
-ffmpeg -y -i video/out.mp4  -vf "rotate=2*PI*t/%time%" -c:a copy video/out-rotated.mp4
+echo [6/7] generate rotated video
+ffmpeg -loglevel error -hide_banner -y -i video/out.mp4  %codec% -vf "rotate=2*PI*t/%time%" -c:a copy video/%filename%_VinylVideo_HEVC-FHD.mp4
 
-
-rem -filter_complex "[0:v][1:v]blend=all_mode=softlight[v],[v]drawtext=fontfile=PTM75F.ttf:text='%artist%':fontcolor=black:fontsize=20:x=(w-text_w)/2:y=((h-text_h)/2)-75,drawtext=fontfile=PTM55F.ttf:text='%title%':fontcolor=black:fontsize=20:y=((h-text_h)/2)+75:x=(w-text_w)/2 [v2],[v2]scale=-2:1080[v3]"
-rem -filter rotate=2*pi+5/T -vf "scale=500:500,loop=-1:1" lossless=1
-rem -c:v libx265 -x265-params lossless=1 -shortest -pix_fmt yuv420p -movflags faststart
+echo [7/7] delete temporary files
+del %CD%\gfx\*.png
+del %CD%\video\out.mp4
