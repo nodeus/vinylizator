@@ -23,7 +23,7 @@ ffmpeg -loglevel error -hide_banner -y -i %audio% -c:v copy -an gfx/albumart.png
 
 rem resize image
 echo [3/7] resize albumart
-ffmpeg -loglevel error -hide_banner -y -i gfx/albumart.png -filter_complex scale=-2:368 -sws_flags spline gfx/cover.png
+magick gfx/albumart.png -resize 368x368\^ gfx/cover.png
 
 rem composite cover and clear vinyl mockup
 echo [4/7] composite cover and empty vinyl mockup
@@ -32,7 +32,7 @@ magick composite -gravity center -compose Multiply gfx/covercrop.png gfx/default
 
 rem generate video cover from albumart with music duration
 echo [5/7] generate video cover
-ffmpeg -loglevel error -hide_banner -y -loop 1 -i gfx/covernew.png -i %audio% -shortest -vf drawtext="fontsize=14:fontfile=font/PTM55F.ttf:text='%artist%-%title%':x=(w-text_w)/2:y=(h-text_h)/2+45" %codec% video/out.mp4
+ffmpeg -loglevel error -hide_banner -y -loop 1 -i gfx/covernew.png -i %audio% -shortest -filter_complex "drawtext=fontsize=14:fontfile=font/PTM55F.ttf:fontcolor=white:text='%filename%':x=(w-text_w)/2:y=(h-text_h)/2+45, drawtext=fontsize=14:fontfile=font/PTM55F.ttf:fontcolor=black:text='%filename%':x=(w-text_w)/2-1:y=(h-text_h)/2+44" %codec% video/out.mp4
 
 rem generate rotated cover from albumart
 echo [6/7] generate rotated video
