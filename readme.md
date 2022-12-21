@@ -2,6 +2,8 @@
 Track cover from mp3 file becomes a disc cover, metadata of the title and author of the track are superimposed on the disc cover.
 If an mp3 file has no built in track cover, the disc cover is set by default.
 
+Place the audio.mp3 file in the /audio folder and run the script rotate.bat
+
 Using [ffmpeg](https://ffmpeg.org/) and [imagemagick](https://imagemagick.org/)
 
 * [example 1 on youtube](https://youtu.be/QwEt7cZvQ2o)
