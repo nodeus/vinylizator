@@ -1,19 +1,22 @@
 rem using ffmpeg https://ffmpeg.org/
 rem using graphicsmagic http://www.graphicsmagick.org
-@cls
 @echo off
-@chcp 65001
-@set audio=audio/audio.mp3
-set codec=-c:v hevc_nvenc -profile:v main10 -pix_fmt yuv420p -preset fast -rc constqp -qp 22 -init_qpB 2 -movflags +faststart -flags +cgop -framerate 60 -r 60
+chcp 65001
+set audio=audio/audio.mp3
+set codec=-c:v hevc_nvenc -profile:v main10 -pix_fmt yuv420p -preset fast -rc constqp -qp 15 -init_qpB 2 -movflags +faststart -flags +cgop -framerate 60 -r 60
 copy /y %CD%\gfx\default\albumart.png %CD%\gfx\albumart.png
+@cls
 
 rem set time in sec for 360 degree rotate
 set time=15
+rem set some vars
+set fontsize=16
+set fontfile=font/PTM55F.ttf
 
 echo [1/7] generate text metadata
-
 for /f "tokens=1 delims=x" %%b in ('"ffprobe -v error -show_entries format_tags=artist -of csv=s=x:p=0 "%audio%""') do set artist=%%b
 for /f "tokens=1 delims=x" %%c in ('"ffprobe -v error -show_entries format_tags=title -of csv=s=x:p=0 "%audio%""') do set title=%%c
+set textmeta="%artist%-%title%"
 set filename="%artist%-%title%"
 set filename=%filename: =_%
 
@@ -32,7 +35,7 @@ magick composite -gravity center -compose Multiply gfx/covercrop.png gfx/default
 
 rem generate video cover from albumart with music duration
 echo [5/7] generate video cover
-ffmpeg -loglevel error -hide_banner -y -loop 1 -i gfx/covernew.png -i %audio% -shortest -filter_complex "drawtext=fontsize=14:fontfile=font/PTM55F.ttf:fontcolor=white:text='%filename%':x=(w-text_w)/2:y=(h-text_h)/2+45, drawtext=fontsize=14:fontfile=font/PTM55F.ttf:fontcolor=black:text='%filename%':x=(w-text_w)/2-1:y=(h-text_h)/2+44" %codec% video/out.mp4
+ffmpeg -loglevel error -hide_banner -y -loop 1 -i gfx/covernew.png -i %audio% -shortest -filter_complex "drawtext=fontsize=%fontsize%:fontfile=%fontfile%:fontcolor=white:text='"—%textmeta%—"':x=(w-text_w)/2:y=(h-text_h)/2+75, drawtext=%fontsize%:fontfile=font/PTM55F.ttf:fontcolor=black:text='"—%textmeta%—"':x=(w-text_w)/2-1:y=(h-text_h)/2+74" %codec% video/out.mp4
 
 rem generate rotated cover from albumart
 echo [6/7] generate rotated video
