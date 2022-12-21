@@ -6,4 +6,8 @@ If an mp3 file has no built in track cover, the disc cover is set by default
 using [ffmpeg](https://ffmpeg.org/)
 using [imagemagick](https://imagemagick.org/)
 
+[example 1 on youtube](https://youtu.be/QwEt7cZvQ2o)
+[example 2 on youtube](https://youtu.be/nphaZMfzduQ)
+[example 3 on youtube](https://youtu.be/BhLRert2kWM)
+
 [nodeus^lightfuture 2022](http://nodeus.ru)
