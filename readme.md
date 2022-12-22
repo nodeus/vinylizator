@@ -1,4 +1,5 @@
 # Vinylizator
+![vinylizator](https://user-images.githubusercontent.com/4481438/209211261-566725d3-da9d-4f82-8772-01072840a565.png)
 Track cover from mp3 file becomes a disc cover, metadata of the title and author of the track are superimposed on the disc cover.
 If an mp3 file has no built in track cover, the disc cover is set by default.
 
