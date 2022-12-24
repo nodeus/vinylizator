@@ -10,7 +10,14 @@ rem nodeus^lightfuture 2022
 @echo off
 @chcp 65001
 @set audio=audio/audio.mp3
-@set codec=-c:v hevc_nvenc -profile:v main10 -pix_fmt yuv420p -preset fast -rc constqp -qp 15 -init_qpB 2 -movflags +faststart -flags +cgop -framerate 60 -r 60
+
+rem nvidia hevc — set codec for nvidia hardware rendering
+rem @set codec=-c:v hevc_nvenc -profile:v main10 -pix_fmt yuv420p -preset fast -rc constqp -qp 15 -init_qpB 2 -movflags +faststart -flags +cgop -framerate 60 -r 60
+rem amd hevc — set codec for AMD hardware rendering
+rem @set codec=-c:v hevc_amf -rc cqp -qp_p 22 -qp_i 22 -movflags +faststart -flags +cgop -framerate 60 -r 60
+rem set codec for software render
+@set codec=-c:v libx264 -crf 22 -movflags +faststart -flags +cgop -framerate 60 -r 60
+
 @copy /y %CD%\gfx\default\albumart.png %CD%\gfx\albumart.png
 @cls
 
