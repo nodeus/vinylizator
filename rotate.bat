@@ -12,11 +12,11 @@ rem nodeus^lightfuture 2022
 @set audio=audio/audio.mp3
 
 rem nvidia hevc — set codec for nvidia hardware rendering
-rem @set codec=-c:v hevc_nvenc -profile:v main10 -pix_fmt yuv420p -preset fast -rc constqp -qp 15 -init_qpB 2 -movflags +faststart -flags +cgop -framerate 60 -r 60
+@set codec=-c:v hevc_nvenc -profile:v main10 -pix_fmt yuv420p -preset fast -rc constqp -qp 15 -init_qpB 2 -movflags +faststart -flags +cgop -framerate 60 -r 60
 rem amd hevc — set codec for AMD hardware rendering
 rem @set codec=-c:v hevc_amf -rc cqp -qp_p 22 -qp_i 22 -movflags +faststart -flags +cgop -framerate 60 -r 60
 rem set codec for software render
-@set codec=-c:v libx264 -crf 22 -movflags +faststart -flags +cgop -framerate 60 -r 60
+rem @set codec=-c:v libx264 -crf 22 -movflags +faststart -flags +cgop -framerate 60 -r 60
 
 @copy /y %CD%\gfx\default\albumart.png %CD%\gfx\albumart.png
 @cls
@@ -49,7 +49,7 @@ echo [4/7] composite cover and empty vinyl mockup
 
 rem generate static video cover from albumart with music track duration
 echo [5/7] generate video cover
-@ffmpeg -loglevel error -hide_banner -y -loop 1 -i gfx/covernew.png -i %audio% -shortest -filter_complex "drawtext=fontsize=%fontsize%:fontfile=%fontfile%:fontcolor=white:text='"—%textmeta%—"':x=(w-text_w)/2:y=(h-text_h)/2+75, drawtext=%fontsize%:fontfile=font/PTM55F.ttf:fontcolor=black:text='"—%textmeta%—"':x=(w-text_w)/2-1:y=(h-text_h)/2+74" %codec% video/out.mp4
+@ffmpeg -loglevel error -hide_banner -y -loop 1 -i gfx/covernew.png -i %audio% -shortest -filter_complex "drawtext=fontsize=%fontsize%:fontfile=%fontfile%:fontcolor=white:text=`—%textmeta%—`:x=(w-text_w)/2:y=(h-text_h)/2+75, drawtext=%fontsize%:fontfile=font/PTM55F.ttf:fontcolor=black:text=`—%textmeta%—`:x=(w-text_w)/2-1:y=(h-text_h)/2+74" %codec% video/out.mp4
 
 rem generate rotated cover from albumart
 echo [6/7] generate rotated video
